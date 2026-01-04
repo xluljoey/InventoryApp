@@ -266,57 +266,94 @@ class CustomersPanel(ctk.CTkFrame):
             messagebox.showwarning("No Selection", "Please select a customer to edit", parent=self)
             return
         
-        item = self.tree.item(selection[0])
-        customer_id = item['values'][0]
-        current_name = item['values'][1]
-        current_phone = item['values'][2]
-        
-        # Create a simple edit dialog
-        dialog = ctk.CTkToplevel(self)
-        dialog.title("Edit Customer")
-        dialog.geometry("400x320")
-        dialog.after(10, lambda: dialog.focus_force())
-        dialog.after(100, lambda: dialog.lift())
-        dialog.transient(self.winfo_toplevel())
-        dialog.grab_set()
-        
-        # Main container with background
-        main_frame = ctk.CTkFrame(dialog, fg_color="white", corner_radius=15)
-        main_frame.pack(fill="both", expand=True, padx=10, pady=10)
-        
-        ctk.CTkLabel(main_frame, text="Edit Customer Details", font=("Arial", 16, "bold"), text_color="#1e293b").pack(pady=(20, 15))
-        
-        name_entry = ctk.CTkEntry(main_frame, placeholder_text="Full Name", width=300, height=40)
-        name_entry.pack(pady=10)
-        name_entry.insert(0, current_name)
-        
-        phone_entry = ctk.CTkEntry(main_frame, placeholder_text="Phone Number", width=300, height=40)
-        phone_entry.pack(pady=10)
-        phone_entry.insert(0, str(current_phone))
-        
-        def save_changes():
-            new_name = name_entry.get().strip()
-            new_phone = phone_entry.get().strip()
+        try:
+            item = self.tree.item(selection[0])
+            customer_id = item['values'][0]
+            current_name = item['values'][1]
+            current_phone = item['values'][2] if item['values'][2] is not None else ""
             
-            if not new_name:
-                messagebox.showerror("Error", "Name cannot be empty", parent=dialog)
-                return
+            # Create a simple edit dialog with proper Windows/Linux compatibility
+            dialog = ctk.CTkToplevel(self)
+            dialog.title("Edit Customer")
+            dialog.geometry("400x350")
             
-            try:
-                conn = get_db_connection()
-                cursor = conn.cursor()
-                cursor.execute("UPDATE customers SET name = ?, phone = ? WHERE id = ?", 
-                             (new_name, new_phone, customer_id))
-                conn.commit()
-                conn.close()
-                messagebox.showinfo("Success", "Customer updated successfully", parent=dialog)
-                dialog.destroy()
-                self.load_data()
-            except Exception as e:
-                messagebox.showerror("Error", f"Failed to update customer: {e}", parent=dialog)
-        
-        ctk.CTkButton(dialog, text="Save Changes", command=save_changes,
-                     fg_color="#10b981", hover_color="#059669", height=40, width=200).pack(pady=20)
+            # Make dialog modal and center on parent
+            dialog.transient(self)
+            dialog.grab_set()
+            dialog.focus_set()
+            
+            # Proper positioning for Windows/Linux compatibility
+            dialog.update_idletasks()
+            x = self.winfo_rootx() + (self.winfo_width() // 2) - (400 // 2)
+            y = self.winfo_rooty() + (self.winfo_height() // 2) - (350 // 2)
+            dialog.geometry(f"+{x}+{y}")
+            
+            # Main container with background
+            main_frame = ctk.CTkFrame(dialog, fg_color="white", corner_radius=15)
+            main_frame.pack(fill="both", expand=True, padx=20, pady=20)
+            
+            ctk.CTkLabel(main_frame, text="Edit Customer Details", 
+                        font=("Arial", 16, "bold"), text_color="#1e293b").pack(pady=(20, 25))
+            
+            # Name field
+            name_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
+            name_frame.pack(fill="x", padx=20, pady=5)
+            
+            ctk.CTkLabel(name_frame, text="Customer Name:", 
+                        font=("Arial", 12, "bold"), text_color="#0f172a").pack(anchor="w")
+            
+            name_entry = ctk.CTkEntry(name_frame, placeholder_text="Full Name", height=40)
+            name_entry.pack(fill="x", pady=(5, 15))
+            name_entry.insert(0, current_name)
+            
+            # Phone field
+            phone_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
+            phone_frame.pack(fill="x", padx=20, pady=5)
+            
+            ctk.CTkLabel(phone_frame, text="Phone Number:", 
+                        font=("Arial", 12, "bold"), text_color="#0f172a").pack(anchor="w")
+            
+            phone_entry = ctk.CTkEntry(phone_frame, placeholder_text="Phone Number", height=40)
+            phone_entry.pack(fill="x", pady=(5, 15))
+            phone_entry.insert(0, str(current_phone))
+            
+            # Buttons frame
+            button_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
+            button_frame.pack(fill="x", padx=20, pady=10)
+            
+            def save_changes():
+                new_name = name_entry.get().strip()
+                new_phone = phone_entry.get().strip()
+                
+                if not new_name:
+                    messagebox.showerror("Error", "Name cannot be empty", parent=dialog)
+                    return
+                
+                try:
+                    conn = get_db_connection()
+                    cursor = conn.cursor()
+                    cursor.execute("UPDATE customers SET name = ?, phone = ? WHERE id = ?", 
+                                 (new_name, new_phone, customer_id))
+                    conn.commit()
+                    conn.close()
+                    messagebox.showinfo("Success", "Customer updated successfully", parent=dialog)
+                    dialog.destroy()
+                    self.load_data()
+                except Exception as e:
+                    messagebox.showerror("Error", f"Failed to update customer: {str(e)}", parent=dialog)
+            
+            # Save and Cancel buttons
+            ctk.CTkButton(button_frame, text="Save Changes", command=save_changes,
+                         fg_color="#10b981", hover_color="#059669", height=40).pack(side="left", padx=5, expand=True)
+            
+            ctk.CTkButton(button_frame, text="Cancel", command=dialog.destroy,
+                         fg_color="#64748b", hover_color="#475569", height=40).pack(side="left", padx=5, expand=True)
+            
+            # Bind Enter key to save
+            dialog.bind('<Return>', lambda e: save_changes())
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to open edit dialog: {str(e)}", parent=self)
 
     def view_history(self):
         """View customer purchase history"""
@@ -329,8 +366,11 @@ class CustomersPanel(ctk.CTkFrame):
         customer_id = item['values'][0]
         customer_name = item['values'][1]
         
-        parent_window = self.winfo_toplevel()
-        CustomerHistoryWindow(parent_window, customer_id, customer_name)
+        try:
+            parent_window = self.winfo_toplevel()
+            CustomerHistoryWindow(parent_window, customer_id, customer_name)
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to open customer history: {e}", parent=self)
     
     def clear_debt(self):
         """Clear customer debt"""
@@ -975,11 +1015,16 @@ class AlertsPanel(ctk.CTkFrame):
             
             tree.insert("", "end", values=(p[1], batch, expiry, f"{bags:.1f}"))
         
-        # Add scrollbar for expired products
-        scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=tree.yview)
-        scrollbar.pack(side="right", fill="y")
-        tree.configure(yscrollcommand=scrollbar.set)
-        tree.pack(side="left", fill="both", expand=True)
+        # Add scrollbar for expired products - Windows/Linux compatibility fix
+        try:
+            scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=tree.yview)
+            tree.configure(yscrollcommand=scrollbar.set)
+            # Pack in the right order for cross-platform compatibility
+            tree.pack(side="left", fill="both", expand=True)
+            scrollbar.pack(side="right", fill="y")
+        except:
+            # Fallback if scrollbar causes issues on certain platforms
+            tree.pack(side="left", fill="both", expand=True)
     
     def load_expiring(self):
         """Load near expiry products"""

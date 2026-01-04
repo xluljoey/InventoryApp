@@ -31,27 +31,16 @@ if errorlevel 1 (
 echo    Done!
 echo.
 
-echo [Step 2/5] Generating Application Icon...
-echo    Choose icon type:
-echo    [1] MCF Logo (text) - Default
-echo    [2] Chicken Logo
+echo [Step 2/5] Using Application Icon...
+echo    Using existing inventory-management.ico file
 echo.
-set /p choice="    Enter choice (1 or 2, default=1): "
-
-if "%choice%"=="" set choice=1
-if "%choice%"=="2" (
-    python generate_icon.py chicken
-) else (
-    python generate_icon.py mcf
+if not exist "inventory-management.ico" (
+    echo    ERROR: inventory-management.ico not found!
+    echo    Please make sure the icon file exists in the project root
+    pause
+    exit /b 1
 )
-
-if errorlevel 1 (
-    echo    WARNING: Could not generate icon automatically
-    echo    Using existing app.ico if available
-    echo.
-) else (
-    echo    Icon generated successfully!
-)
+echo    Icon file found: inventory-management.ico
 echo.
 
 echo [Step 3/5] Cleaning old build files...
