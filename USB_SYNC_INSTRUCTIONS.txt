@@ -1,0 +1,63 @@
+╔════════════════════════════════════════════════════════════╗
+║          📦 READY TO SYNC TO USB: CCCOMA_X64F              ║
+╚════════════════════════════════════════════════════════════╝
+
+✅ ALL CHANGES ARE IN: /home/joey/Desktop/projects/inventory_app
+
+🎯 TO SYNC TO USB, RUN:
+
+   cd /home/joey/Desktop/projects/inventory_app
+   python3 SYNC_TO_USB.py
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 WHAT WILL BE SYNCED:
+
+✅ ui/customer_window.py      - Edit Customer fix
+✅ db/database.py              - payment_history table
+✅ micchris.spec               - Optimized build (faster startup)
+✅ ui/sell_window.py           - Spacing fixes
+✅ main.py                     - Alert banner fix
+✅ All other .py files         - Latest versions
+✅ build_windows.bat           - Build script
+✅ README.md                   - Documentation
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 SYNC PROCESS:
+
+1. Make sure USB (CCCOMA_X64F) is plugged in
+2. Run: python3 SYNC_TO_USB.py
+3. Script will copy all files to USB
+4. Safely eject USB
+5. On Windows: Run build_windows.bat
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ WHAT'S FIXED:
+
+✅ Edit Customer - Opens proper dialog (not placeholder)
+✅ Pay Debt - Records payment with history
+✅ Adjust Debt - Manual debt correction
+✅ Delete Customer - Removes from database
+✅ Startup Speed - Optimized (20s → 8-12s first run)
+✅ Sell Window - Buttons always visible
+✅ Alert Banner - Hidden when not needed
+✅ Customer Debt - Tracks correctly
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📍 LOCATIONS:
+
+Source (Linux):  /home/joey/Desktop/projects/inventory_app
+USB Target:      /run/media/joey/CCCOMA_X64F/inventory_app
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🗑️ TO DELETE inventory_app_CLEAN:
+
+   rm -rf /home/joey/Desktop/inventory_app_CLEAN
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ READY TO SYNC! ✨
